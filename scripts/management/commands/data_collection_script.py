@@ -1,6 +1,8 @@
 import traceback
 import csv
-
+import operator
+from datetime import date
+from dateutil import parser
 import os
 import requests
 import sys
@@ -32,13 +34,21 @@ def dump_data_to_csv(filename, data):
             writer.writerow(_d)
 
 
-def filter_data(data, category):
+def filter_data_by_string(data, field, value):
     _rv = list()
     for _d in data:
-        if _d.get('category') == category:
+        if _d.get(field) == value:
             _rv.append(_d)
     return _rv
 
+
+def filter_data_by_date(data, field, value, op=operator.ge):
+    _rv = list()
+    for _d in data:
+        date_value = parser.parse(_d.get(field)).date()
+        if op(date_value, value):
+            _rv.append(_d)
+    return _rv
 
 def change_keys_to_title_case(data):
     rv = list()
@@ -55,9 +65,11 @@ def fetch_data_from_api_and_create_csv(url, category, filename):
     while next:
         data = call_url(url, processor)
         results = data.get('results')
-        category_data = filter_data(results, category)
-        category_data = change_keys_to_title_case(category_data)
-        dump_data_to_csv(filename, category_data)
+        category_data = filter_data_by_string(results, 'category', category)
+        category_data_date_filtered = filter_data_by_date(category_data, 'start_date', date(year=2018, day=1, month=6))
+        filtered_data_with_keys_in_title_case = change_keys_to_title_case(category_data_date_filtered)
+        dump_data_to_csv(filename, filtered_data_with_keys_in_title_case)
+        sys.stdout.write('Successfully Wrote data for the page {}\n'.format(url))
         if data.get('next'):
             next = True
             url = data.get('next')

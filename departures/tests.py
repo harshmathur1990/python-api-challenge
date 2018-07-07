@@ -1,8 +1,11 @@
 import os
+
+from datetime import date
 from django.test import TestCase
 import responses
 # Create your tests here.
-from scripts.management.commands.data_collection_script import filter_data, dump_data_to_csv, \
+from scripts.management.commands.data_collection_script import filter_data_by_string,\
+    dump_data_to_csv, filter_data_by_date, \
     fetch_data_from_api_and_create_csv, change_keys_to_title_case
 
 
@@ -59,7 +62,8 @@ class DeparturesTest(TestCase):
             "finish_date": "2018-04-13",
             "category": "Marine"
         }]
-        filtered_data = filter_data(data, category='Adventurous')
+        filtered_data_by_category = filter_data_by_string(data, 'category', 'Adventurous')
+        filtered_data_by_date = filter_data_by_date(filtered_data_by_category, 'start_date', date(year=2018, day=1, month=6))
 
         expected_data = [
             {
@@ -67,18 +71,12 @@ class DeparturesTest(TestCase):
                 "start_date": "2018-08-31",
                 "finish_date": "2018-09-10",
                 "category": "Adventurous"
-            },
-            {
-                "name": "Galapagos Discovery",
-                "start_date": "2018-04-03",
-                "finish_date": "2018-04-13",
-                "category": "Adventurous"
             }
         ]
 
-        assert len(filtered_data)==len(expected_data)
+        assert len(filtered_data_by_date)==len(expected_data)
 
-        for _filtered, _expected in zip(filtered_data, expected_data):
+        for _filtered, _expected in zip(filtered_data_by_date, expected_data):
             for k, v in _filtered.items():
                 assert _expected[k]==v
 
