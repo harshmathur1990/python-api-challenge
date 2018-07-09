@@ -4,12 +4,14 @@ import operator
 import sys
 
 from datetime import date
-from django.core.management.base import BaseCommand
 
+import os
+from django.core.management.base import BaseCommand
+from django.conf import settings
+
+from scripts.management.constants import fieldnames, filename, category, base_url, start_date
 from utilities.filters import FilterChain, Filter, DateFilter
 from utilities.utils import get_call, processor, change_dict_keys_to_title_case, dump_data_to_csv
-
-base_url = 'http://127.0.0.1:8000'
 
 
 def fetch_data_from_api_and_create_csv(url, filename, fieldnames, filter_chain=None):
@@ -35,11 +37,18 @@ class Command(BaseCommand):
         url = base_url + '/departures'
         try:
             filter_chain = FilterChain()
-            date_filter = DateFilter('start_date', operator.ge, date(year=2018, month=6, day=1))
-            category_filter = Filter('category', operator.eq, 'Adventurous')
+            date_filter = DateFilter(
+                'start_date',
+                operator.ge,
+                date(
+                    year=start_date.get('year'),
+                    month=start_date.get('month'),
+                    day=start_date.get('day')
+                )
+            )
+            category_filter = Filter('category', operator.eq, category)
             filter_chain.add_filter(date_filter).add_filter(category_filter)
-            fieldnames = ['Name', 'Start Date', 'Finish Date', 'Category']
-            fetch_data_from_api_and_create_csv(url, 'adventurous_data.csv', fieldnames, filter_chain)
+            fetch_data_from_api_and_create_csv(url, filename, fieldnames, filter_chain)
         except Exception as e:
             err = traceback.format_exc()
             sys.stderr.write(err)

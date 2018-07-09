@@ -2,6 +2,11 @@ import os
 
 from datetime import date
 import operator
+
+import sys
+
+import requests
+import requests_mock
 from django.test import TestCase
 import responses
 # Create your tests here.
@@ -11,10 +16,13 @@ from scripts.management.commands.data_collection_script import \
 from utilities.filters import FilterChain, DateFilter, Filter
 
 
+from utilities.utils import get_call, processor
+
+
 class DeparturesTest(TestCase):
 
     def setUp(self):
-        self.base_url = 'http://127.0.0.1:8000'
+        self.base_url = os.getenv('BASE_URL')
         super(DeparturesTest, self).setUp()
 
     def tearDown(self):
@@ -269,10 +277,11 @@ class DeparturesTest(TestCase):
         }
         first_url = self.base_url + '/departures/?limit=10'
         second_url = self.base_url + '/departures/?limit=10&offset=10'
+        sys.stderr.write(first_url)
         responses.add(responses.GET, first_url,
-                  json=first_page_data, status=200)
+                  json=first_page_data, status=200, match_querystring=True)
         responses.add(responses.GET, second_url,
-                  json=second_page_data, status=200)
+                  json=second_page_data, status=200, match_querystring=True)
 
         filename = 'test_pagination_output.csv'
         fieldnames = ['Name', 'Start Date', 'Finish Date', 'Category']
@@ -287,3 +296,38 @@ class DeparturesTest(TestCase):
 
         if os.path.exists(filename):
             os.remove(filename)
+
+    @responses.activate
+    def test_api_failure(self):
+
+        first_page_data = {
+            'error': 'Unauthenticated'
+        }
+        first_url = self.base_url + '/departures/?limit=10'
+        responses.add(responses.GET, first_url,
+                      json=first_page_data, status=401, match_querystring=True)
+
+        with self.assertRaises(SystemExit) as cm:
+            get_call(first_url, response_processor=processor)
+
+        self.assertEqual(cm.exception.code, 1)
+
+        second_url = self.base_url + '/departures/?limit=10&offset=10'
+        responses.add(responses.GET, second_url,
+                      status=504, match_querystring=True)
+
+        with self.assertRaises(SystemExit) as cm:
+            get_call(second_url, response_processor=processor)
+
+        self.assertEqual(cm.exception.code, 1)
+
+    @requests_mock.mock()
+    def test_api_timed_out(self, m):
+
+        first_url = self.base_url + '/departures/?limit=10'
+        m.register_uri('GET', first_url, exc=requests.exceptions.Timeout)
+
+        with self.assertRaises(SystemExit) as cm:
+            get_call(first_url, response_processor=processor)
+
+        self.assertEqual(cm.exception.code, 1)

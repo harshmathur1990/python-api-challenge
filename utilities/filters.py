@@ -48,6 +48,8 @@ class FilterChain(object):
         return self
 
     def filter(self, results):
+        if not results:
+            return list()
         _rv = copy.deepcopy(results)
         for _filter in self._filters:
             _rv = _filter.filter(_rv)
