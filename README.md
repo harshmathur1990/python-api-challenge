@@ -114,7 +114,7 @@ Otherwise, the rest is up to you!
 
 ## Work Done
 
-1. Data migration (departures/migrations/0002_auto_20180706_1234.py) reads the streams the file
+1. Data migration (departures/migrations/0002_auto_20180706_1234.py) streams the file
    into json objects and bulk creates in Chunk of 50.
 
 2. Filter Chain is a class which contains chain of filters to be applied in sequence.
@@ -132,13 +132,13 @@ Otherwise, the rest is up to you!
 
 7. YAJL is required dependency to run this script. install it using:
 
-  on macOS:
-      brew install yajl
+      on macOS:
+          brew install yajl
 
-  on other systems:
-      git clone git@github.com:lloyd/yajl.git
-      cd yajl
-      ./configure && make install
+      on other systems:
+          git clone git@github.com:lloyd/yajl.git
+          cd yajl
+          ./configure && make install
 
 8. Steps For installing python requirements:
 
@@ -150,6 +150,10 @@ Otherwise, the rest is up to you!
 
 9. The migrations are already run in sqlite, so nothing to run there.
 
-10. python manage.py test
+10. To run test:
 
-11. python manage.py data_collection_script
+        python manage.py test
+
+11. To run script:
+
+        python manage.py data_collection_script
