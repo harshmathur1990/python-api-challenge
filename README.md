@@ -131,14 +131,14 @@ Otherwise, the rest is up to you!
    the .env.sample to .env before running the program.
 
 7. YAJL is required dependency to run this script. install it using:
+       
+       on macOS:
+           brew install yajl
 
-      on macOS:
-          brew install yajl
-
-      on other systems:
-          git clone git@github.com:lloyd/yajl.git
-          cd yajl
-          ./configure && make install
+       on other systems:
+           git clone git@github.com:lloyd/yajl.git
+           cd yajl
+           ./configure && make install
 
 8. Steps For installing python requirements:
 
