@@ -111,3 +111,21 @@ We've included a basic Django project and a `Departure` model with some fields,
 which you will consume.
 
 Otherwise, the rest is up to you!
+
+## Work Done
+
+1. Data migration reads the streams the file into json objects and bulk creates in Chunk of 50.
+
+2. Filter Chain is a class which contains chain of filters to be applied in sequence.
+
+3. dump_data_to_csv method dumps a list of dictionaries to a csv file provided a name and headers. The headers provided
+   are keys in dictionaries.
+
+4. change_dict_keys_to_title_case method iterate over dictionaries and change keys to title case
+
+5. get_call method makes a HTTP get using requests and accepts a processor to process the response.
+    It exits the program if something goes wrong after logging to stderr.
+
+6. dotenv is used to pick the configs from environment variables. Hence must rename the .env.sample to .env before running the program.
+
+7.

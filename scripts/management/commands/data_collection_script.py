@@ -52,3 +52,4 @@ class Command(BaseCommand):
         except Exception as e:
             err = traceback.format_exc()
             sys.stderr.write(err)
+            sys.exit(1)
