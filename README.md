@@ -127,5 +127,3 @@ Otherwise, the rest is up to you!
     It exits the program if something goes wrong after logging to stderr.
 
 6. dotenv is used to pick the configs from environment variables. Hence must rename the .env.sample to .env before running the program.
-
-7.
