@@ -114,16 +114,42 @@ Otherwise, the rest is up to you!
 
 ## Work Done
 
-1. Data migration reads the streams the file into json objects and bulk creates in Chunk of 50.
+1. Data migration (departures/migrations/0002_auto_20180706_1234.py) reads the streams the file
+   into json objects and bulk creates in Chunk of 50.
 
 2. Filter Chain is a class which contains chain of filters to be applied in sequence.
 
-3. dump_data_to_csv method dumps a list of dictionaries to a csv file provided a name and headers. The headers provided
-   are keys in dictionaries.
+3. dump_data_to_csv method dumps a list of dictionaries to a csv file provided a name and headers.
+   The headers provided are keys in dictionaries.
 
 4. change_dict_keys_to_title_case method iterate over dictionaries and change keys to title case
 
 5. get_call method makes a HTTP get using requests and accepts a processor to process the response.
     It exits the program if something goes wrong after logging to stderr.
 
-6. dotenv is used to pick the configs from environment variables. Hence must rename the .env.sample to .env before running the program.
+6. dotenv is used to pick the configs from environment variables. Hence must rename
+   the .env.sample to .env before running the program.
+
+7. YAJL is required dependency to run this script. install it using:
+
+  on macOS:
+      brew install yajl
+
+  on other systems:
+      git clone git@github.com:lloyd/yajl.git
+      cd yajl
+      ./configure && make install
+
+8. Steps For installing python requirements:
+
+       python3 -m venv env
+
+       source env/bin/activate
+
+       pip3 install -r requirements.txt
+
+9. The migrations are already run in sqlite, so nothing to run there.
+
+10. python manage.py test
+
+11. python manage.py data_collection_script
